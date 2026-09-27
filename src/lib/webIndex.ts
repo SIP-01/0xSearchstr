@@ -1,7 +1,7 @@
 /**
  * Search Index Protocol (SIP-01) v1.2 — reference implementation.
  * (v1.2 = NIP-reference audit only; the wire format is unchanged from v1.)
- * Canonical spec: https://github.com/NostrDanish/SIP-01 (local copy: docs/)
+ * Canonical spec: https://github.com/SIP-01/SIP-01 (local copy: docs/)
  *
  * One addressable event (kind 39697) per indexed web document:
  *   d = "widx:" + sha256(normalized_url)[0:32]   ← URL identity
@@ -37,6 +37,7 @@ const MAX_URL_LEN = 2048;
 const MAX_TITLE_LEN = 300;
 const MAX_DESCRIPTION_LEN = 1000;
 const MAX_IMAGE_LEN = 2048;
+const MAX_ALT_LEN = 1000;
 const MAX_SOURCE_LEN = 100;
 const MAX_TAGS = 8;
 
@@ -266,19 +267,31 @@ function getTag(event: NostrEvent, name: string): string | undefined {
 
 /**
  * Parse + validate a kind 39697 event. Returns null for anything malformed:
- * wrong kind, missing required fields, bad/overlong URL, unsupported version.
- * Cheap synchronous checks only — hash verification (d ↔ u, x ↔ content) is
- * available via verifyObservation() for readers that want spec §18 step 2.
+ * wrong kind, missing/duplicated required fields (spec §5: exactly one d,
+ * u, v, alt), bad/overlong URL, unsupported version. Cheap synchronous
+ * checks only — hash verification (d ↔ u, x ↔ content) is available via
+ * verifyObservation() for readers that want spec §18 step 2. Mirrors the
+ * reference validator's acceptance rules (SIP-01 org sip01-utils).
  */
 export function parseIndexEvent(event: NostrEvent): IndexObservation | null {
   if (event.kind !== WEB_INDEX_KIND) return null;
 
-  const d = getTag(event, 'd');
-  const url = getTag(event, 'u');
-  const version = getTag(event, 'v');
+  // Required tags must appear EXACTLY once each (spec §5).
+  const dTags = event.tags.filter(([n]) => n === 'd');
+  const uTags = event.tags.filter(([n]) => n === 'u');
+  const vTags = event.tags.filter(([n]) => n === 'v');
+  const altTags = event.tags.filter(([n]) => n === 'alt');
+  if (dTags.length !== 1 || uTags.length !== 1 || vTags.length !== 1 || altTags.length !== 1) {
+    return null;
+  }
+
+  const d = dTags[0][1];
+  const url = uTags[0][1];
+  const version = vTags[0][1];
   if (!d?.startsWith(WEB_INDEX_D_PREFIX) || !url || version !== WEB_INDEX_SCHEMA_VERSION) {
     return null;
   }
+  if (!altTags[0][1]?.trim() || altTags[0][1].length > MAX_ALT_LEN) return null;
   if (url.length > MAX_URL_LEN) return null;
 
   const normalized = normalizeIndexUrl(url);
@@ -305,7 +318,8 @@ export function parseIndexEvent(event: NostrEvent): IndexObservation | null {
     .filter((v) => TOPIC_RE.test(v))
     .slice(0, MAX_TAGS);
 
-  const language = getTag(event, 'l');
+  const langRaw = getTag(event, 'l');
+  const language = langRaw && LANGUAGE_RE.test(langRaw) ? langRaw : undefined;
 
   const publishedTag = getTag(event, 'published');
   const published = publishedTag ? parseInt(publishedTag, 10) : NaN;
@@ -323,7 +337,7 @@ export function parseIndexEvent(event: NostrEvent): IndexObservation | null {
     description,
     image,
     topics,
-    language: language && LANGUAGE_RE.test(language) ? language : undefined,
+    language,
     contentHash: getTag(event, 'x'),
     published: Number.isFinite(published) ? published : undefined,
     source: getTag(event, 'source'),

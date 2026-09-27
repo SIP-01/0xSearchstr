@@ -48,7 +48,7 @@ NIP-B7 (Blossom URL fallback — uploads already go through Blossom).
 > **SIP-01 (v1.1):** the shared **web document index** now lives at **kind 39697** — one
 > addressable event per URL per indexer, signed by per-device pseudonymous indexing
 > identities (no central key, no queries in events). The canonical spec lives at
-> [github.com/NostrDanish/SIP-01](https://github.com/NostrDanish/SIP-01) — local copy at
+> [github.com/SIP-01/SIP-01](https://github.com/SIP-01/SIP-01) — local copy at
 > [docs/SIP-01.md](docs/SIP-01.md), implementation guide at
 > [docs/IMPLEMENTATION-GUIDE.md](docs/IMPLEMENTATION-GUIDE.md). The kind 30078 query
 > cache below is **legacy but frozen and still read** — there is no flag day.

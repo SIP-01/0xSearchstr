@@ -1,18 +1,22 @@
 /**
  * Explore page — browse the community search index.
  *
- * Three kinds of community content live here:
+ * Four kinds of community content live here:
  *   1. Recently indexed pages — SIP-01 document observations (kind 39697),
  *      signed by per-device indexing identities across all compatible clients;
  *   2. Trending searches — hashed term signals (kind 30078): a term's
  *      plaintext only becomes visible once 3+ independent devices searched
  *      it, so nobody's confidential query ever appears here;
- *   3. Staked keywords — Presearch-style community keyword placements.
+ *   3. Staked keywords — Presearch-style community keyword placements;
+ *   4. The crawler network — live kind 16919 heartbeats from distributed
+ *      crawler nodes (Crawlstr scouts, indexstr network nodes), with shard
+ *      coverage. Self-reported and unverified: health telemetry, never a
+ *      trust input.
  * Clicking any query runs it instantly — from Nostr, no external API call needed.
  */
 import { Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
-import { Compass, Search, TrendingUp, Clock, ArrowRight, Gem, FileText, Users } from 'lucide-react';
+import { Compass, Search, TrendingUp, Clock, ArrowRight, Gem, FileText, Users, Radio, Layers } from 'lucide-react';
 
 import { Layout } from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
@@ -21,6 +25,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useTrendingTerms, type TrendingTerm } from '@/hooks/useTrendingTerms';
 import { useRecentStakes, type StakeEntry } from '@/hooks/useRecentStakes';
 import { useRecentIndexedDocs, type IndexedDocEntry } from '@/hooks/useRecentIndexedDocs';
+import { useCrawlerNetwork } from '@/hooks/useCrawlerNetwork';
 import { sanitizeUrl } from '@/lib/sanitizeUrl';
 
 function timeAgo(timestamp: number): string {
@@ -35,6 +40,7 @@ export default function Explore() {
   const { data: entries, isLoading } = useTrendingTerms();
   const { data: stakes } = useRecentStakes();
   const { data: docs, isLoading: docsLoading } = useRecentIndexedDocs();
+  const { data: crawlers, isLoading: crawlersLoading } = useCrawlerNetwork();
 
   useSeoMeta({
     title: 'Explore the Index - 0xSearchstr',
@@ -121,6 +127,125 @@ export default function Explore() {
                 <DocCard key={doc.url} doc={doc} />
               ))}
             </div>
+          )}
+        </section>
+
+        {/* Crawler network (kind 16919 heartbeats — self-reported telemetry) */}
+        <section className="mb-10">
+          <h2 className="text-sm font-semibold mb-1">Crawler network</h2>
+          <p className="text-xs text-muted-foreground mb-4">
+            Live distributed crawler nodes (Crawlstr scouts, indexstr network nodes) reporting
+            heartbeats on Nostr. Self-reported and unverified — coverage telemetry, never a trust input.
+          </p>
+
+          {crawlersLoading && (
+            <Card>
+              <CardContent className="py-4 px-5 space-y-2">
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-3 w-1/3" />
+              </CardContent>
+            </Card>
+          )}
+
+          {!crawlersLoading && (!crawlers || crawlers.liveNodes.length === 0) && (
+            <Card className="border-dashed">
+              <CardContent className="py-6 px-8 text-center">
+                <Radio className="w-6 h-6 mx-auto mb-2 text-muted-foreground/40" />
+                <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                  No live crawler nodes right now. Nodes running{' '}
+                  <a
+                    href="https://github.com/SIP-01/Crawlstr-v3"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    Crawlstr
+                  </a>{' '}
+                  or{' '}
+                  <a
+                    href="https://github.com/SIP-01/indexstr-v2"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    indexstr
+                  </a>{' '}
+                  appear here automatically.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
+          {crawlers && crawlers.liveNodes.length > 0 && (
+            <Card className="border-primary/20 bg-primary/5">
+              <CardContent className="py-4 px-5">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+                  <div>
+                    <p className="text-2xl font-bold tracking-tight">{crawlers.liveNodes.length}</p>
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Radio className="w-3 h-3" /> live nodes
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold tracking-tight">
+                      {crawlers.shardsCovered}
+                      <span className="text-sm text-muted-foreground font-normal">/{crawlers.shardCount}</span>
+                    </p>
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Layers className="w-3 h-3" /> shards covered
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold tracking-tight">
+                      {crawlers.selfReported.pagesIndexed.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-muted-foreground">pages indexed*</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold tracking-tight">
+                      {crawlers.selfReported.queueSize.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-muted-foreground">queued URLs*</p>
+                  </div>
+                </div>
+
+                {/* Shard coverage bar */}
+                <div className="h-2 rounded-full bg-muted overflow-hidden mb-4" role="img"
+                  aria-label={`${crawlers.shardsCovered} of ${crawlers.shardCount} shards covered`}>
+                  <div
+                    className="h-full bg-primary rounded-full transition-all"
+                    style={{ width: `${Math.min(100, (crawlers.shardsCovered / crawlers.shardCount) * 100)}%` }}
+                  />
+                </div>
+
+                {/* Freshest nodes */}
+                <div className="space-y-1.5">
+                  {crawlers.liveNodes.slice(0, 5).map((node) => (
+                    <div key={node.pubkey} className="flex items-center gap-2 text-xs flex-wrap">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
+                      <span className="font-mono text-muted-foreground">
+                        shard {node.shard}
+                      </span>
+                      <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                        {node.source ?? 'crawler'}
+                      </Badge>
+                      {node.network !== 'unknown' && (
+                        <Badge variant="outline" className="text-[10px] px-1.5 py-0">{node.network}</Badge>
+                      )}
+                      <span className="inline-flex items-center gap-1 text-muted-foreground/60 ml-auto">
+                        <Clock className="w-3 h-3" />
+                        {timeAgo(node.createdAt)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <p className="text-[11px] text-muted-foreground/60 mt-3">
+                  *Self-reported totals from node heartbeats — indicative only, unverified.
+                  Reputation in results derives from signed observations, not heartbeats.
+                </p>
+              </CardContent>
+            </Card>
           )}
         </section>
 

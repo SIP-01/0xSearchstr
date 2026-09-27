@@ -325,6 +325,25 @@ describe('parseIndexEvent', () => {
     expect(parseIndexEvent(event)).toBeNull();
   });
 
+  it('rejects duplicated required tags (spec §5: exactly one d/u/v/alt)', async () => {
+    const base = () => buildIndexEvent({ url: 'https://example.com/page', title: 'T' });
+    for (const name of ['d', 'u', 'v', 'alt']) {
+      const tags = (await base())!.tags;
+      const duplicated = [...tags, [name, tags.find(([n]) => n === name)![1]]];
+      const event = await makeEvent({ tags: duplicated });
+      expect(parseIndexEvent(event)).toBeNull();
+    }
+  });
+
+  it('rejects an empty or overlong alt tag (spec §5)', async () => {
+    const tags = (await buildIndexEvent({ url: 'https://example.com/page', title: 'T' }))!.tags;
+    const emptyAlt = await makeEvent({ tags: tags.map((t) => (t[0] === 'alt' ? ['alt', '   '] : t)) });
+    expect(parseIndexEvent(emptyAlt)).toBeNull();
+
+    const longAlt = await makeEvent({ tags: tags.map((t) => (t[0] === 'alt' ? ['alt', 'x'.repeat(1001)] : t)) });
+    expect(parseIndexEvent(longAlt)).toBeNull();
+  });
+
   it('round-trips registered extension tags (spec §9.2)', async () => {
     const sk = generateSecretKey();
     const template = (await buildIndexEvent({

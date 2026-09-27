@@ -1,8 +1,8 @@
 # Search Index Protocol (SIP-01)
 
 > **The canonical specification has moved to its own repository:**
-> **[github.com/NostrDanish/SIP-01](https://github.com/NostrDanish/SIP-01)**
-> — specifically [`public/spec/SIP-01.md`](https://github.com/NostrDanish/SIP-01/blob/main/public/spec/SIP-01.md) (**v1.2**).
+> **[github.com/SIP-01/SIP-01](https://github.com/SIP-01/SIP-01)**
+> — specifically [`public/spec/SIP-01.md`](https://github.com/SIP-01/SIP-01/blob/main/public/spec/SIP-01.md) (**v1.2**).
 >
 > That document is the single source of truth for the wire format. This file
 > documents **0xSearchstr's implementation** of it and stays intentionally thin
@@ -61,6 +61,17 @@ server-side with operators like `site:`, `lang:`, `after:`; stock relays
 ignore unsupported operators per NIP-50 and fall back to default behavior.
 Results from both paths merge by event id.
 
+### Crawler network telemetry (kind 16919)
+
+The crawler ecosystem (Crawlstr scouts, indexstr network nodes) publishes
+**heartbeats** — kind 16919, replaceable, one per node, schema from indexstr:
+content = `{ v, shard (00–FF), platform, network, charging, stats: { pagesIndexed, queueSize, published } }`
+with a `source` tag (`crawlstr/v3`, `indexstr/v2`, …). We read them
+(`src/lib/heartbeat.ts`, `src/hooks/useCrawlerNetwork.ts`) and surface the
+network on `/explore`: live nodes, 256-shard coverage, per-family counts.
+Heartbeats are self-reported and unverified — coverage telemetry only, never
+a reputation input. Reputation derives from signed kind 39697 observations.
+
 ### Legacy compatibility (spec §17)
 
 The kind 30078 query cache (`d: "0xsearchstr:cache:*"`) is frozen legacy data:
@@ -72,14 +83,18 @@ There is no flag day. See [../NIP.md](../NIP.md) for the legacy schemas.
 
 The test suite ([`src/lib/webIndex.test.ts`](../src/lib/webIndex.test.ts))
 reproduces all six canonical §13 test vectors — URL identity (`d`) and content
-identity (`x`). If those pass, this client is wire-compatible with every
+identity (`x`) — plus the strict §5 single-occurrence rules (exactly one
+`d`/`u`/`v`/`alt`). If those pass, this client is wire-compatible with every
 crawler, relay, and engine in the ecosystem.
 
 ## Links
 
-- Canonical spec (v1.1): <https://github.com/NostrDanish/SIP-01>
-- Implementation guide: <https://github.com/NostrDanish/SIP-01/blob/main/docs/IMPLEMENTATION-GUIDE.md>
-- Ecosystem: [Crawlstr](https://github.com/NostrDanish/Crwalstr) (crawler),
-  [UNCAGED-ENGINE](https://github.com/NostrDanish/UNCAGED-ENGINE) (reference engine),
+- Canonical spec (v1.2): <https://github.com/SIP-01/SIP-01>
+- Implementation guide: <https://github.com/SIP-01/SIP-01/blob/main/docs/IMPLEMENTATION-GUIDE.md>
+- Ecosystem (the [SIP-01 org](https://github.com/SIP-01)):
+  [Crawlstr v3](https://github.com/SIP-01/Crawlstr-v3) + [indexstr v2](https://github.com/SIP-01/indexstr-v2)
+  (crawler network), [UNCAGED-ENGINE](https://github.com/NostrDanish/UNCAGED-ENGINE) (reference engine),
   [UNCAGED-Index-Relay](https://github.com/NostrDanish/UNCAGED-Index-Relay) (validating relay),
+  [SIP-Booster-Relay](https://github.com/SIP-01/SIP-Booster-Relay) (serverless relay cohort),
+  [SIP-dashboard](https://github.com/SIP-01/SIP-dashboard) (network telemetry),
   [0xPresearchstr](https://github.com/NostrDanish/0xPresearchstr) (sister engine)

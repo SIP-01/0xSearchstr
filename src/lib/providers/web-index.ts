@@ -1,7 +1,7 @@
 /**
  * Web Index provider — searches the shared decentralized web index
  * (Search Index Protocol kind 39697 document observations, spec:
- * https://github.com/NostrDanish/SIP-01 — local copy docs/SIP-01.md).
+ * https://github.com/SIP-01/SIP-01 — local copy docs/SIP-01.md).
  *
  * Reading (spec §15):
  * - Baseline: plain NIP-01 filters work on every relay. We fetch recent
