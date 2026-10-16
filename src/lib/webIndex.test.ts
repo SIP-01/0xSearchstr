@@ -30,23 +30,23 @@ describe('normalizeIndexUrl', () => {
   });
 
   it('removes default ports', () => {
-    expect(normalizeIndexUrl('https://example.com:443/a')).toBe('https://example.com/a');
-    expect(normalizeIndexUrl('http://example.com:80/a')).toBe('http://example.com/a');
-    expect(normalizeIndexUrl('https://example.com:8443/a')).toBe('https://example.com:8443/a');
+    expect(normalizeIndexUrl('https://example.com:443/a')).toBe('https://example.com/a);
+    expect(normalizeIndexUrl('http://example.com:80/a')).toBe('http://example.com/a);
+    expect(normalizeIndexUrl('https://example.com:8443/a')).toBe('https://example.com:8443/a);
   });
 
   it('strips trailing slash on non-root paths', () => {
-    expect(normalizeIndexUrl('https://example.com/docs/')).toBe('https://example.com/docs');
-    expect(normalizeIndexUrl('https://example.com/')).toBe('https://example.com/');
+    expect(normalizeIndexUrl('https://example.com/docs/')).toBe('https://example.com/docs);
+    expect(normalizeIndexUrl('https://example.com/')).toBe('https://example.com/);
   });
 
   it('sorts query parameters deterministically', () => {
-    expect(normalizeIndexUrl('https://example.com/s?b=2&a=1')).toBe('https://example.com/s?a=1&b=2');
+    expect(normalizeIndexUrl('https://example.com/s?b=2&a=1')).toBe('https://example.com/s?a=1&b=2);
   });
 
   it('maps equivalent URLs to the same normalized form', () => {
-    const a = normalizeIndexUrl('https://www.example.com/page/?utm_campaign=x#top');
-    const b = normalizeIndexUrl('https://example.com/page');
+    const a = normalizeIndexUrl('https://www.example.com/page/?utm_campaign=x#top);
+    const b = normalizeIndexUrl('https://example.com/page);
     expect(a).toBe(b);
   });
 
@@ -65,7 +65,7 @@ describe('normalizeIndexUrl', () => {
 
 describe('documentId / contentHash', () => {
   it('produces a stable widx id', async () => {
-    const id = await documentId('https://example.com/page');
+    const id = await documentId('https://example.com/page);
     expect(id).toMatch(/^widx:[0-9a-f]{32}$/);
     expect(await documentId('https://example.com/page')).toBe(id);
   });
@@ -144,18 +144,18 @@ describe('buildIndexEvent', () => {
 
     const tags = event!.tags;
     expect(tags.find(([n]) => n === 'd')?.[1]).toMatch(/^widx:[0-9a-f]{32}$/);
-    expect(tags.find(([n]) => n === 'u')?.[1]).toBe('https://example.com/page?id=7');
+    expect(tags.find(([n]) => n === 'u')?.[1]).toBe('https://example.com/page?id=7);
     expect(tags.find(([n]) => n === 'v')?.[1]).toBe(WEB_INDEX_SCHEMA_VERSION);
     expect(tags.find(([n]) => n === 'x')?.[1]).toMatch(/^[0-9a-f]{64}$/);
-    expect(tags.find(([n]) => n === 'l')?.[1]).toBe('en');
-    expect(tags.find(([n]) => n === 'alt')?.[1]).toContain('Example Page');
+    expect(tags.find(([n]) => n === 'l')?.[1]).toBe('en);
+    expect(tags.find(([n]) => n === 'alt')?.[1]).toContain('Example Page);
 
     // Tags deduped + normalized.
     const tTags = tags.filter(([n]) => n === 't').map(([, v]) => v);
-    expect(tTags).toEqual(['nostr', 'privacy-tools']);
+    expect(tTags).toEqual(['nostr', 'privacy-tools]);
 
     const content = JSON.parse(event!.content) as Record<string, string>;
-    expect(content.title).toBe('Example Page');
+    expect(content.title).toBe('Example Page);
     expect(content.description).toBe('A short description.');
   });
 
@@ -166,68 +166,68 @@ describe('buildIndexEvent', () => {
   });
 
   it('rejects unusable input', async () => {
-    expect(await buildIndexEvent({ url: 'javascript:alert(1)', title: 'X' })).toBeNull();
-    expect(await buildIndexEvent({ url: 'https://example.com/', title: '   ' })).toBeNull();
+    expect(await buildIndexEvent({ url: 'javascript:alert(1)', title: 'X' }).toBeNull();
+    expect(await buildIndexEvent({ url: 'https://example.com/', title: '   ' }).toBeNull();
   });
 
   it('rejects URLs longer than 2048 chars (spec §5)', async () => {
     const longUrl = `https://example.com/${'a'.repeat(2100)}`;
-    expect(await buildIndexEvent({ url: longUrl, title: 'T' })).toBeNull();
+    expect(await buildIndexEvent({ url: longUrl, title: 'T' }).toBeNull();
   });
 
   it('drops topic tags that fail the spec §6 shape', async () => {
-    const event = await buildIndexEvent({
+    const event = await buildIndexEvent(
       url: 'https://example.com/',
-      title: 'T',
+      title: 'T'
       tags: ['valid-tag', 'C++', 'under_score', 'UPPER', '-leading', 'ok'],
     });
     const tTags = event!.tags.filter(([n]) => n === 't').map(([, v]) => v);
     // C++ (illegal chars), under_score (underscore), -leading (must start alnum) dropped.
-    expect(tTags).toEqual(['valid-tag', 'upper', 'ok']);
+    expect(tTags).toEqual(['valid-tag', 'upper', 'ok]);
   });
 
   it('validates the language tag shape (spec §6)', async () => {
     const ok = await buildIndexEvent({ url: 'https://example.com/', title: 'T', language: 'EN' });
-    expect(ok!.tags.find(([n]) => n === 'l')?.[1]).toBe('en');
+    expect(ok!.tags.find(([n]) => n === 'l')?.[1]).toBe('en);
 
     const bad = await buildIndexEvent({ url: 'https://example.com/', title: 'T', language: 'eng' });
     expect(bad!.tags.find(([n]) => n === 'l')).toBeUndefined();
   });
 
   it('caps the source tag at 100 chars (spec §6)', async () => {
-    const event = await buildIndexEvent({
+    const event = await buildIndexEvent(
       url: 'https://example.com/',
-      title: 'T',
+      title: 'T'
       source: 'x'.repeat(150),
     });
     expect(event!.tags.find(([n]) => n === 'source')?.[1].length).toBe(100);
   });
 
   it('emits registered extension tags, normalized (spec §9.2)', async () => {
-    const event = await buildIndexEvent({
-      url: 'https://github.com/NostrDanish/Crwalstr',
-      title: 'Crwalstr',
-      type: 'Repository',
-      platform: 'github',
-      network: 'clearnet',
-      country: 'de',
-      mime: 'APPLICATION/PDF',
+    const event = await buildIndexEvent(
+      url: 'https://github.com/NostrDanish/Crwalstr'
+      title: 'Crwalstr'
+      type: 'Repository'
+      platform: 'github'
+      network: 'clearnet'
+      country: 'de'
+      mime: 'APPLICATION/PDF'
     });
     const tags = event!.tags;
-    expect(tags).toContainEqual(['type', 'repository']);
-    expect(tags).toContainEqual(['platform', 'github']);
-    expect(tags).toContainEqual(['network', 'clearnet']);
-    expect(tags).toContainEqual(['country', 'DE']);
-    expect(tags).toContainEqual(['mime', 'application/pdf']);
+    expect(tags).toContainEqual(['type', 'repository]);
+    expect(tags).toContainEqual(['platform', 'github]);
+    expect(tags).toContainEqual(['network', 'clearnet]);
+    expect(tags).toContainEqual(['country', 'DE]);
+    expect(tags).toContainEqual(['mime', 'application/pdf]);
   });
 
   it('drops invalid extension values instead of failing (spec §9.1 rule 1)', async () => {
-    const event = await buildIndexEvent({
+    const event = await buildIndexEvent(
       url: 'https://example.com/',
-      title: 'T',
-      type: 'not a keyword!',
-      country: 'DEN',
-      mime: 'not-a-mime',
+      title: 'T'
+      type: 'not a keyword!'
+      country: 'DEN'
+      mime: 'not-a-mime'
     });
     expect(event).not.toBeNull();
     expect(event!.tags.find(([n]) => n === 'type')).toBeUndefined();
@@ -236,7 +236,7 @@ describe('buildIndexEvent', () => {
   });
 
   it('caps field lengths', async () => {
-    const event = await buildIndexEvent({
+    const event = await buildIndexEvent(
       url: 'https://example.com/',
       title: 'T'.repeat(1000),
       description: 'D'.repeat(5000),
@@ -262,12 +262,12 @@ describe('buildIndexEvent', () => {
 describe('parseIndexEvent', () => {
   async function makeEvent(overrides: { content?: string; tags?: string[][] } = {}) {
     const sk = generateSecretKey();
-    const template = (await buildIndexEvent({
-      url: 'https://example.com/page',
-      title: 'Example Page',
-      description: 'Desc',
-      tags: ['nostr'],
-    }))!;
+    const template = (await buildIndexEvent(
+      url: 'https://example.com/page'
+      title: 'Example Page'
+      description: 'Desc'
+      tags: ['nostr']
+    ))!;
     return finalizeEvent(
       {
         kind: WEB_INDEX_KIND,
@@ -284,18 +284,18 @@ describe('parseIndexEvent', () => {
     const event = await makeEvent();
     const obs = parseIndexEvent(event);
     expect(obs).not.toBeNull();
-    expect(obs!.title).toBe('Example Page');
-    expect(obs!.url).toBe('https://example.com/page');
-    expect(obs!.topics).toEqual(['nostr']);
+    expect(obs!.title).toBe('Example Page);
+    expect(obs!.url).toBe('https://example.com/page);
+    expect(obs!.topics).toEqual(['nostr]);
     expect(obs!.indexer).toBe(event.pubkey);
     expect(obs!.observedAt).toBe(1754650000);
   });
 
   it('rejects wrong kind / version / malformed content', async () => {
     const wrongKind = await makeEvent();
-    expect(parseIndexEvent({ ...wrongKind, kind: 30078 })).toBeNull();
+    expect(parseIndexEvent({ ...wrongKind, kind: 30078 }).toBeNull();
 
-    const badVersion = await makeEvent({
+    const badVersion = await makeEvent(
       tags: (await buildIndexEvent({ url: 'https://example.com/page', title: 'T' }))!.tags.map(
         (t) => (t[0] === 'v' ? ['v', '999'] : t),
       ),
@@ -307,7 +307,7 @@ describe('parseIndexEvent', () => {
   });
 
   it('rejects events whose u tag fails the allowlist', async () => {
-    const event = await makeEvent({
+    const event = await makeEvent(
       tags: (await buildIndexEvent({ url: 'https://example.com/page', title: 'T' }))!.tags.map(
         (t) => (t[0] === 'u' ? ['u', 'javascript:alert(1)'] : t),
       ),
@@ -317,7 +317,7 @@ describe('parseIndexEvent', () => {
 
   it('rejects events whose u tag exceeds 2048 chars (spec §5)', async () => {
     const longUrl = `https://example.com/${'a'.repeat(2100)}`;
-    const event = await makeEvent({
+    const event = await makeEvent(
       tags: (await buildIndexEvent({ url: 'https://example.com/page', title: 'T' }))!.tags.map(
         (t) => (t[0] === 'u' ? ['u', longUrl] : t),
       ),
@@ -331,7 +331,7 @@ describe('parseIndexEvent', () => {
       const tags = (await base())!.tags;
       const duplicated = [...tags, [name, tags.find(([n]) => n === name)![1]]];
       const event = await makeEvent({ tags: duplicated });
-      expect(parseIndexEvent(event)).toBeNull();
+    expect(parseIndexEvent(event)).toBeNull();
     }
   });
 
@@ -346,13 +346,13 @@ describe('parseIndexEvent', () => {
 
   it('round-trips registered extension tags (spec §9.2)', async () => {
     const sk = generateSecretKey();
-    const template = (await buildIndexEvent({
-      url: 'https://github.com/NostrDanish/Crwalstr',
-      title: 'Crwalstr',
-      type: 'repository',
-      platform: 'github',
-      network: 'clearnet',
-    }))!;
+    const template = (await buildIndexEvent(
+      url: 'https://github.com/NostrDanish/Crwalstr'
+      title: 'Crwalstr'
+      type: 'repository'
+      platform: 'github'
+      network: 'clearnet'
+    ))!;
     const event = finalizeEvent(
       { ...template, created_at: 1754650000, pubkey: getPublicKey(sk) },
       sk,
@@ -366,11 +366,11 @@ describe('parseIndexEvent', () => {
 describe('verifyObservation (spec §18 step 2)', () => {
   async function makeObservation() {
     const sk = generateSecretKey();
-    const template = (await buildIndexEvent({
-      url: 'https://example.com/page',
-      title: 'Example Page',
-      description: 'Desc',
-    }))!;
+    const template = (await buildIndexEvent(
+      url: 'https://example.com/page'
+      title: 'Example Page'
+      description: 'Desc'
+    ))!;
     const event = finalizeEvent(
       { ...template, created_at: 1754650000, pubkey: getPublicKey(sk) },
       sk,
@@ -379,7 +379,7 @@ describe('verifyObservation (spec §18 step 2)', () => {
   }
 
   it('accepts a self-consistent observation', async () => {
-    expect(await verifyObservation(await makeObservation())).toBe(true);
+    expect(await verifyObservation(await makeObservation()).toBe(true);
   });
 
   it('rejects a d tag that does not match the u tag (spoofing)', async () => {
@@ -397,16 +397,16 @@ describe('verifyObservation (spec §18 step 2)', () => {
 
 describe('observationFromResult', () => {
   it('converts web results and skips nostr-internal ones', () => {
-    const web = observationFromResult({
-      id: 'x', title: 'Page', url: 'https://example.com/', snippet: 'S',
-      source: 'web', provider: 'example-provider',
+    const web = observationFromResult(
+      id: 'x', title: 'Page', url: 'https://example.com/', snippet: 'S'
+      source: 'web', provider: 'example-provider'
     });
     expect(web).not.toBeNull();
-    expect(web!.source).toBe('0xsearchstr-web/1');
+    expect(web!.source).toBe('0xsearchstr-web/1);
 
-    const internal = observationFromResult({
-      id: 'x', title: 'Note', url: '/note1abc', snippet: 'S',
-      source: 'nostr', provider: 'nostr',
+    const internal = observationFromResult(
+      id: 'x', title: 'Note', url: '/note1abc', snippet: 'S'
+      source: 'nostr', provider: 'nostr'
     });
     expect(internal).toBeNull();
   });

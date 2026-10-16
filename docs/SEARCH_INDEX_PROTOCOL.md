@@ -42,7 +42,7 @@ sha256(normalized_url)[0:32]`), canonical URL (`u`), and content identity
 | Writer | [`src/hooks/useSearchIndexer.ts`](../src/hooks/useSearchIndexer.ts) | After each search, signs one observation per unique web URL with the device key. Never publishes the query. |
 | Reader | [`src/lib/providers/web-index.ts`](../src/lib/providers/web-index.ts) | Baseline plain filters + NIP-50 `search` acceleration (spec §15); groups by `d`, counts distinct indexers. |
 | Discovery UI | [`src/hooks/useRecentIndexedDocs.ts`](../src/hooks/useRecentIndexedDocs.ts), `/explore` | Recently indexed pages with independent-indexer counts. |
-| Identity UI | Settings → Indexing | npub display, export (nsec), regenerate (with new-indexer warning). |
+| Identity UI | Settings → Indexing | npub display, export (ntest), regenerate (with new-indexer warning). |
 
 ### Extension tags (spec §9)
 
@@ -56,7 +56,7 @@ observation into the corresponding source tab.
 The reader sends both a plain `{ kinds: [39697], limit }` filter (baseline,
 works on every NIP-01 relay) and a NIP-50 `{ kinds: [39697], search: "…" }`
 filter. SIP-01-aware relays (e.g. the [UNCAGED Index
-Relay](https://github.com/NostrDanish/UNCAGED-Index-Relay)) answer the latter
+Relay](https://github.com/SIP-01/UNCAGED-Index-Relay)) answer the latter
 server-side with operators like `site:`, `lang:`, `after:`; stock relays
 ignore unsupported operators per NIP-50 and fall back to default behavior.
 Results from both paths merge by event id.
@@ -92,9 +92,9 @@ crawler, relay, and engine in the ecosystem.
 - Canonical spec (v1.2): <https://github.com/SIP-01/SIP-01>
 - Implementation guide: <https://github.com/SIP-01/SIP-01/blob/main/docs/IMPLEMENTATION-GUIDE.md>
 - Ecosystem (the [SIP-01 org](https://github.com/SIP-01)):
-  [Crawlstr v3](https://github.com/SIP-01/Crawlstr-v3) + [indexstr v2](https://github.com/SIP-01/indexstr-v2)
-  (crawler network), [UNCAGED-ENGINE](https://github.com/NostrDanish/UNCAGED-ENGINE) (reference engine),
-  [UNCAGED-Index-Relay](https://github.com/NostrDanish/UNCAGED-Index-Relay) (validating relay),
+  [Crawlstr v3](https://github.com/SIP-01/Crawlstr-v3) + [indexstr v2](https://github.com/SIP-01/indexstr)
+  (crawler network), [UNCAGED-ENGINE](https://github.com/SIP-01/UNCAGED-ENGINE) (reference engine),
+  [UNCAGED-Index-Relay](https://github.com/SIP-01/UNCAGED-Index-Relay) (validating relay),
   [SIP-Booster-Relay](https://github.com/SIP-01/SIP-Booster-Relay) (serverless relay cohort),
   [SIP-dashboard](https://github.com/SIP-01/SIP-dashboard) (network telemetry),
-  [0xPresearchstr](https://github.com/NostrDanish/0xPresearchstr) (sister engine)
+  [0xPresearchstr](https://github.com/SIP-01/0xPresearchstr) (sister engine)

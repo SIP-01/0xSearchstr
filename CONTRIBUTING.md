@@ -11,7 +11,7 @@ This project takes content moderation seriously. The content policy pipeline is 
 ### Frontend Development
 
 ```bash
-git clone https://github.com/NostrDanish/0xSearchstr.git
+git clone https://github.com/SIP-01/0xSearchstr.git
 cd 0xSearchstr
 npm install
 npm run dev
