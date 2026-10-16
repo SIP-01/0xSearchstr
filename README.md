@@ -86,7 +86,7 @@ The index isn't just a bot cache — **any logged-in Nostr user can submit links
 
 ### 🌐 Federation: One Index, Many Clients
 
-The **Search Index Protocol** (kind 39697, canonical spec: **[SIP-01/SIP-01](https://github.com/SIP-01/SIP-01)**) is **shared with [0xPresearchstr](https://github.com/SIP-01/0xPresearchstr), the [UNCAGED Index Relay](https://github.com/SIP-01/UNCAGED-Index-Relay), the [Crawlstr](https://github.com/SIP-01/Crawlstr-v3) + [indexstr](https://github.com/SIP-01/indexstr) crawler network, and open to any fork or third-party engine**. Every browser is its own indexer — there is no central signing key:
+The **Search Index Protocol** (kind 39697, canonical spec: **[SIP-01/SIP-01](https://github.com/SIP-01/SIP-01)**) is **shared with [0xPresearchstr](https://github.com/SIP-01/0xPresearchstr), the [UNCAGED Index Relay](https://github.com/SIP-01/UNCAGED-Index-Relay), the [Crawlstr](https://github.com/SIP-01/Crawlstr-v3) + [indexstr](https://github.com/SIP-01/indexstr-v2) crawler network, and open to any fork or third-party engine**. Every browser is its own indexer — there is no central signing key:
 
 - **Per-device identity** — each browser generates its own indexer keypair on first use (Settings → Indexing). Pseudonymous, replaceable, exportable.
 - **Independent observations** — when indexer A and indexer B both see `example.com`, they publish separate events with the *same* `d` tag. Search nodes count distinct indexers per document — "7 independent indexers saw this page."
@@ -287,4 +287,80 @@ All providers run in parallel. The UI shows live status:
 ✔ Nostr (124ms)  ✔ Wikipedia (230ms)  ⏳ SearXNG...  ⏳ HN...
 ```
 
-Results appear as each provider finishes — no waiting for th
+Results appear as each provider finishes — no waiting for the slowest one.
+
+---
+
+## Search Tabs
+
+The tab bar is **fully modular** — Settings → Search Tabs lets every user pick which tabs show, reorder them, and star the tab a fresh visit starts on. Deep links (`/?source=tor&q=…`) keep working even for hidden tabs.
+
+| Tab | Sources |
+|-----|--------|
+| **Web** | Web Index (SIP-01) + Stakes + Community + SearXNG + DuckDuckGo + Brave (BYOK) |
+| **Index** | The community index only — SIP-01 observations + legacy cache |
+| **All** | All providers merged + ranked (stakes on top) |
+| **Nostr** | Profiles, notes, articles, Wikifreedia, files, torrents, code snippets |
+| **News** | Hacker News stories |
+| **Wiki** | Nostr wiki articles (NIP-54 pool); Wikipedia engine off until enabled |
+| **Code** | Git repos/issues/PRs (NIP-34 via ngit/GRASP) + NIP-C0 snippets; Stack Overflow off until enabled |
+| **Tor** | .onion hidden services via Ahmia + index-observed onion pages |
+| **I2P** | Eepsite directory links + index-observed eepsites |
+
+---
+
+## Self-Hosted Backend (Optional)
+
+The `backend/` directory contains a full self-hosted stack for when you want to run your own search infrastructure:
+
+| Service | Description |
+|---------|-------------|
+| **Meilisearch** | Full-text search index engine |
+| **Nostr Crawler** | NIP-01 subscriber indexing kinds 0/1/30023/1063 |
+| **Clearnet Crawler** | Polite web crawler (robots.txt, rate-limited) |
+| **Tor/I2P Crawler** | Hidden service crawler with content policy enforcement |
+| **NIP-50 Relay** | Search relay proxy bridging Meilisearch to Nostr |
+| **Abuse API** | REST search API + abuse report management |
+
+```bash
+cp .env.example .env   # Edit MEILI_API_KEY + ABUSE_ADMIN_TOKEN
+docker compose up -d
+```
+
+See the [backend README](backend/) and [Content Policy](CONTRIBUTING.md) for details.
+
+---
+
+## Protocol Spec
+
+The interoperable web-document index is specified by **SIP-01** — canonical spec at **[github.com/SIP-01/SIP-01](https://github.com/SIP-01/SIP-01)** (kind 39697) — designed so an independent developer can implement a compatible indexer, search node, or search engine without reading this codebase. 0xSearchstr's implementation is byte-compatible with the spec's §13 test vectors (see [docs/SEARCH_INDEX_PROTOCOL.md](docs/SEARCH_INDEX_PROTOCOL.md)).
+
+App-specific legacy schemas — the federated query cache, community submissions, trusted indexer list, and Nostra Search interop — are documented in [NIP.md](NIP.md).
+
+---
+
+## Content Policy
+
+The self-hosted backend enforces content policy modeled on [Ahmia](https://ahmia.fi). Hard-blocked categories: CSAM, human trafficking, weapons sales, drug marketplace listings. See the [Policy page](https://0xSearchstr.shakespeare.wtf/policy) for details.
+
+---
+
+## Tech Stack
+
+- **React 19** + TypeScript + Vite
+- **TailwindCSS 4** + shadcn/ui
+- **Nostrify** — NIP-50 relay search
+- **SearXNG** — meta-search fallback
+- **Wikipedia** — MediaWiki API
+- **Hacker News** — Algolia search
+- **TanStack Query** — data fetching + caching
+
+---
+
+## License
+
+MIT
+
+---
+
+*Vibed with [Shakespeare](https://shakespeare.diy)*
