@@ -107,6 +107,7 @@ Stake **your identity** on a keyword instead of tokens: sign an addressable kind
 ### 👍 Voting & Reporting
 
 Every result card carries 👍/👎 votes and a report flag:
+- **Bookmarks** use the standard NIP-51 global list (kind 10003): public web saves also publish a NIP-B0 kind 39701 record; private web saves are stored only as NIP-44-encrypted list content.
 
 - **Votes** are NIP-25 reactions: kind 7 for native Nostr events and kind 17 with NIP-73 `k=web` / `i=<normalized URL>` for web results. Legacy kind-7/`r` URL votes remain read-only compatible. **Anonymous by default** — signed by this device's indexing identity, never your npub.
 - **Reports** are NIP-56 kind 1984 events (`0xsearchstr.abuse` namespace), landing in the team's `/admin` inbox.
