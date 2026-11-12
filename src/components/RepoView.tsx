@@ -299,7 +299,7 @@ export function RepoView({ event, nip19Id }: { event: NostrEvent; nip19Id: strin
           )}
 
           {/* Votes */}
-          <VoteTalliesProvider results={[{ url: `/${nip19Id}`, nostrEvent: event }]}>
+          <VoteTalliesProvider results={[{ url: `/${nip19Id}`, source: 'nostr', nostrEvent: event }]}>
             <div className="flex items-center gap-2 pt-1 border-t border-border/50">
               <VoteButtons
                 result={{

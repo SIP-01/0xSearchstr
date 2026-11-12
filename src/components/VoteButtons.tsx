@@ -25,7 +25,7 @@ import { cn } from '@/lib/utils';
 const VoteTalliesContext = createContext<Map<string, VoteTally> | null>(null);
 
 export function VoteTalliesProvider({ results, children }: {
-  results: { url: string; nostrEvent?: { id: string } }[];
+  results: { url: string; source?: string; nostrEvent?: { id: string; kind?: number; pubkey?: string; tags?: string[][] } }[];
   children: React.ReactNode;
 }) {
   const keys = useMemo(

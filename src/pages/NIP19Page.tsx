@@ -209,7 +209,7 @@ function EventView({ eventId, author: authorHint, nip19Id }: { eventId: string; 
             <CardContent className="space-y-4">
               <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">{event.content}</p>
               {/* NIP-25 voting — anonymous by default, npub if toggled */}
-              <VoteTalliesProvider results={[{ url: `/${nip19Id}`, nostrEvent: event }]}>
+              <VoteTalliesProvider results={[{ url: `/${nip19Id}`, source: 'nostr', nostrEvent: event }]}>
                 <div className="flex items-center gap-2 pt-1 border-t border-border/50">
                   <VoteButtons
                     result={{
