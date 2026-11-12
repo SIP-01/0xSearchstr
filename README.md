@@ -108,7 +108,7 @@ Stake **your identity** on a keyword instead of tokens: sign an addressable kind
 
 Every result card carries 👍/👎 votes and a report flag:
 
-- **Votes** are NIP-25 reactions (kind 7; `e` tag for events, `r` tag with the SIP-01-normalized URL for pages). **Anonymous by default** — signed by this device's indexing identity, never your npub. Settings → Indexing has an opt-in "vote with my npub" toggle.
+- **Votes** are NIP-25 reactions: kind 7 for native Nostr events and kind 17 with NIP-73 `k=web` / `i=<normalized URL>` for web results. Legacy kind-7/`r` URL votes remain read-only compatible. **Anonymous by default** — signed by this device's indexing identity, never your npub.
 - **Reports** are NIP-56 kind 1984 events (`0xsearchstr.abuse` namespace), landing in the team's `/admin` inbox.
 
 ### 📈 Trending Terms (k-anonymity)
