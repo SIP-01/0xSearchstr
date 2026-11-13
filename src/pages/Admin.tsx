@@ -58,6 +58,7 @@ import {
   useModerationActions,
   useModerationSet,
   useRoleActions,
+  type AbuseReport,
 } from '@/hooks/useModeration';
 import { useAdminAccess } from '@/hooks/useAdminAccess';
 import { useAffiliateRules, useAffiliateActions } from '@/hooks/useAffiliates';
@@ -71,7 +72,6 @@ import {
   isHiddenResult,
   type AppRole,
   type HiddenTarget,
-  type AbuseReport,
 } from '@/lib/moderation';
 import { normalizeIndexUrl } from '@/lib/webIndex';
 import { getIndexRelayUrls, getSearchRelayUrls } from '@/lib/appRelays';
