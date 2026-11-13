@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { finalizeEvent, generateSecretKey, getPublicKey, verifyEvent } from 'nostr-tools/pure';
+import { finalizeEvent, generateSecretKey, verifyEvent } from 'nostr-tools/pure';
 
 import {
   WEB_INDEX_KIND,
