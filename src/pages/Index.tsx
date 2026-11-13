@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { Search, Network, ExternalLink, Gem, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -104,11 +104,10 @@ const Index = () => {
 
   // Pagination — reset to page 1 on a new query or tab, scroll back to the
   // top of the results on every page change.
-  const [page, setPage] = useState(1);
+  const pageKey = `${activeQuery}||${source}`;
+  const [pageState, setPageState] = useState<{ key: string; page: number }>({ key: pageKey, page: 1 });
+  const page = pageState.key === pageKey ? pageState.page : 1;
   const resultsTopRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    setPage(1);
-  }, [activeQuery, source]);
 
   const pageCount = Math.max(1, Math.ceil(totalResults / PAGE_SIZE));
   const currentPage = Math.min(page, pageCount);
@@ -118,9 +117,9 @@ const Index = () => {
   );
 
   const goToPage = useCallback((p: number) => {
-    setPage(p);
+    setPageState({ key: pageKey, page: p });
     resultsTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, []);
+  }, [pageKey]);
 
   // Instant answers (calculator, NIP-19 profiles, Wikipedia summaries).
   const { answer: instantAnswer } = useInstantAnswer(
