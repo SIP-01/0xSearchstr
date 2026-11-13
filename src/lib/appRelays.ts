@@ -145,6 +145,9 @@ export function toSecureRelayUrl(url: string): string {
 export function normalizeRelayUrl(input: string): string | null {
   let url = input.trim();
   if (!url) return null;
+  if (/^https?:\/\//i.test(url)) {
+    url = url.replace(/^https:/i, 'wss:').replace(/^http:/i, 'ws:');
+  }
   if (!url.startsWith('ws://') && !url.startsWith('wss://')) {
     // .onion relays are typically ws:// (no CA-issued TLS); everything else wss://.
     url = url.includes('.onion') ? `ws://${url}` : `wss://${url}`;
