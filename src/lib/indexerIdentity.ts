@@ -79,7 +79,7 @@ function writeStored(secretHex: string): void {
 /** Generate a fresh secret key as 64-char hex, robust to lib return type. */
 function newSecretHex(): string {
   const sk = generateSecretKey();
-  return typeof sk === 'string' ? sk.toLowerCase() : bytesToHex(sk as Uint8Array);
+  return bytesToHex(sk);
 }
 
 function toIdentity(secretHex: string, fresh: boolean): IndexerIdentity {
