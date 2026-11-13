@@ -10,7 +10,7 @@
  * One stake per keyword per pubkey: re-staking the same keyword
  * replaces your previous stake (addressable d-tag).
  */
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Gem, Loader2, Link2 } from 'lucide-react';
 
@@ -47,10 +47,10 @@ export function StakeKeywordDialog({ open, onOpenChange, initialKeyword = '' }: 
   const [pitch, setPitch] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  // Sync the prefill whenever the dialog opens with a new keyword.
-  useEffect(() => {
-    if (open) setKeyword(initialKeyword);
-  }, [open, initialKeyword]);
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (nextOpen) setKeyword(initialKeyword);
+    onOpenChange(nextOpen);
+  };
 
   const reset = () => {
     setKeyword('');
@@ -101,7 +101,7 @@ export function StakeKeywordDialog({ open, onOpenChange, initialKeyword = '' }: 
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
