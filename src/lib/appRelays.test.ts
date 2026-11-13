@@ -59,7 +59,7 @@ describe('relay pools', () => {
     hideDefaultIndexRelay(INDEX_RELAYS[1]);
     hideDefaultSearchRelay(SEARCH_RELAYS[0]);
     restoreAllDefaultIndexRelays();
-    expect(getIndexRelayUrls()).toEqual([...INDEX_RELAYS]);
+    expect(getIndexRelayUrls()).toEqual(INDEX_RELAYS.filter((url) => !url.includes('.onion')));
     restoreDefaultSearchRelay(SEARCH_RELAYS[0]);
     expect(getSearchRelayUrls()).toContain(SEARCH_RELAYS[0]);
   });
