@@ -5,7 +5,8 @@ import { Search, Network, ExternalLink, Gem, ChevronLeft, ChevronRight } from 'l
 
 import { Layout } from '@/components/Layout';
 import { SearchBar } from '@/components/SearchBar';
-import { SourceTabs, type SourceTabValue } from '@/components/SourceTabs';
+import { SourceTabs } from '@/components/SourceTabs';
+import { ALL_SOURCE_TABS, type SourceTabValue } from '@/components/sourceTabs.config';
 import { UnifiedResultCard } from '@/components/UnifiedResultCard';
 import { StakeResultCard } from '@/components/StakeResultCard';
 import { VoteTalliesProvider } from '@/components/VoteButtons';
@@ -23,7 +24,7 @@ import { useInstantAnswer } from '@/hooks/useInstantAnswer';
 import { useAIAnswer } from '@/hooks/useAIAnswer';
 import { useSearchHotkeys } from '@/hooks/useSearchHotkeys';
 import { useAppContext } from '@/hooks/useAppContext';
-import { ALL_SOURCE_TABS } from '@/components/SourceTabs';
+
 import type { SearchSource } from '@/lib/providers/types';
 
 const KNOWN_TAB_IDS = new Set(ALL_SOURCE_TABS.map((t) => t.id as string));
