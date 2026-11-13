@@ -2,18 +2,17 @@
 
 > **The canonical specification has moved to its own repository:**
 > **[github.com/SIP-01/SIP-01](https://github.com/SIP-01/SIP-01)**
-> — specifically [`public/spec/SIP-01.md`](https://github.com/SIP-01/SIP-01/blob/main/public/spec/SIP-01.md) (**v1.2**).
+> — specifically [`public/spec/SIP-01.md`](https://github.com/SIP-01/SIP-01/blob/main/public/spec/SIP-01.md) (**v1.3**, dated 2026-11-07).
 >
 > That document is the single source of truth for the wire format. This file
 > documents **0xSearchstr's implementation** of it and stays intentionally thin
 > so the two never drift apart.
 >
-> **v1.2 note:** documentation-only revision — NIP references re-audited
-> (NIP-33 folded into NIP-01; the `l` tag convention lives in NIP-32, used here
-> in the bare two-element form per §12.5; NIP-50 operator support is
-> SHOULD-level per relay — prefer `site:` over the colliding `domain:`), plus
-> the §20.1 NIP dependency table. **The wire format is unchanged** — schema
-> `v` stays `"1"` and every v1/v1.1 event remains valid.
+> **v1.3 note:** the wire schema remains kind 39697 with `v="1"`. This revision
+> adds optional `role`, repeatable `proto`, and an optional NIP-01 `a` pointer
+> to a kind-39698 capability announcement. These are discovery hints; they do
+> not change kind-39697 document identity or require older consumers to reject
+> events they do not understand.
 
 **One shared decentralized index. Many independent indexers. Many independent
 search nodes. Many independent search engines. No mandatory identity. No single
