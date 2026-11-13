@@ -13,7 +13,7 @@ import { NostrLoginProvider } from '@nostrify/react/login';
 import { AppProvider } from '@/components/AppProvider';
 import { AppConfig } from '@/contexts/AppContext';
 import { APP_RELAYS } from '@/lib/appRelays';
-import { DEFAULT_TAB_CONFIG } from '@/components/SourceTabs';
+import { DEFAULT_TAB_CONFIG } from '@/components/sourceTabs.config';
 import AppRouter from './AppRouter';
 
 const head = createHead({
