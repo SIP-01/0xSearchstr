@@ -5,7 +5,7 @@ import { NostrLoginProvider } from '@nostrify/react/login';
 import NostrProvider from '@/components/NostrProvider';
 import { AppProvider } from '@/components/AppProvider';
 import { AppConfig } from '@/contexts/AppContext';
-import { DEFAULT_TAB_CONFIG } from '@/components/SourceTabs';
+import { DEFAULT_TAB_CONFIG } from '@/components/sourceTabs.config';
 
 interface TestAppProps {
   children: React.ReactNode;
