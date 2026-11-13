@@ -86,6 +86,11 @@ describe('relay pools', () => {
     expect(getIndexRelayUrls()).not.toContain('wss://my-relay.example/');
   });
 
+  it('converts pasted http(s) URLs to the equivalent websocket scheme', () => {
+    expect(normalizeRelayUrl('https://relay.example')).toBe('wss://relay.example/');
+    expect(normalizeRelayUrl('http://relay.example/nostr')).toBe('ws://relay.example/nostr');
+  });
+
   it('normalizes onion hosts to ws:// by default', () => {
     expect(normalizeRelayUrl('abc123.onion')).toBe('ws://abc123.onion/');
     expect(normalizeRelayUrl('wss://abc123.onion/')).toBe('wss://abc123.onion/');
