@@ -253,7 +253,7 @@ describe('buildIndexEvent', () => {
     const sk = generateSecretKey();
     const template = (await buildIndexEvent(input))!;
     const signed = finalizeEvent(
-      { ...template, created_at: Math.floor(Date.now() / 1000), pubkey: getPublicKey(sk) },
+      { ...template, created_at: Math.floor(Date.now() / 1000) },
       sk,
     );
     expect(verifyEvent(signed)).toBe(true);
@@ -275,7 +275,6 @@ describe('parseIndexEvent', () => {
         created_at: 1754650000,
         tags: overrides.tags ?? template.tags,
         content: overrides.content ?? template.content,
-        pubkey: getPublicKey(sk),
       },
       sk,
     );
