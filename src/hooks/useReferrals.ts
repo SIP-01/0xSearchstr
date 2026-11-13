@@ -40,6 +40,7 @@ import {
 } from '@/lib/appProtocol';
 import { useAdminAccess } from '@/hooks/useAdminAccess';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { APP_PROFILE } from '@/lib/appProfile';
 
 /* ------------------------------------------------------------------ */
 /* Referral configuration (0xSearchstr-owned, owner/admin-managed)          */
