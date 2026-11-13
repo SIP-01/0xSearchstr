@@ -86,7 +86,7 @@ function toIdentity(secretHex: string, fresh: boolean): IndexerIdentity {
   // getPublicKey accepts the 32-byte secret; it returns hex in this nostr-tools
   // version, but guard against a byte-array return either way.
   const pub = getPublicKey(hexToBytes(secretHex));
-  const pubkeyHex = typeof pub === 'string' ? pub : bytesToHex(pub as Uint8Array);
+  const pubkeyHex = pub;
   return {
     secretHex,
     pubkeyHex,
