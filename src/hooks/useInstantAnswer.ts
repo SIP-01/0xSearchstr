@@ -336,7 +336,7 @@ export function useInstantAnswer(query: string, enabled: boolean): {
 
   const answer = calculator
     ?? nip19Answer
-    ?? (nip05Enabled ? nip05Answer ?? null : null)
+    ?? (nip05Enabled ? nip05Answer : null)
     ?? (urlEnabled ? urlAnswer ?? null : null)
     ?? (wikiEnabled ? wikiAnswer ?? null : null)
     ?? (ddgEnabled ? ddgAnswer ?? null : null);
