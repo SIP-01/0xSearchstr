@@ -335,11 +335,11 @@ export function useInstantAnswer(query: string, enabled: boolean): {
   });
 
   const answer = calculator
-    ?? nip19Answer
-    ?? (nip05Enabled ? nip05Answer ?? null : null)
-    ?? (urlEnabled ? urlAnswer ?? null : null)
-    ?? (wikiEnabled ? wikiAnswer ?? null : null)
-    ?? (ddgEnabled ? ddgAnswer ?? null : null);
+    || nip19Answer
+    || (nip05Enabled ? nip05Answer : null)
+    || (urlEnabled ? urlAnswer || null : null)
+    || (wikiEnabled ? wikiAnswer || null : null)
+    || (ddgEnabled ? ddgAnswer || null : null);
 
   return { answer, isLoading: wikiEnabled && isLoading };
 }

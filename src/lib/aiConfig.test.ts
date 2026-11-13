@@ -11,6 +11,8 @@ import { describe, it, expect } from 'vitest';
 
 import {
   DEFAULT_AI_CONFIG,
+  engineAIAvailable,
+  type EngineAIStatus,
   ENGINE_AI_BASE,
   getAIConfig,
   hasOwnAIKey,

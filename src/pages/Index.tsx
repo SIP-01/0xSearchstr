@@ -56,7 +56,7 @@ const Index = () => {
   // Map SourceTabValue to provider search source.
   // 'i2p' has no provider — it shows directory links only.
   // 'index' selects only the community-index providers (SIP-01 + legacy cache).
-  const providerSource = source === 'i2p' ? 'all' : source;
+  const providerSource = source === 'i2p' || source === 'index' ? 'all' : source;
 
   const {
     results,
@@ -70,7 +70,7 @@ const Index = () => {
     suppressedProviders,
   } = useProviderSearch({
     query: activeQuery,
-    source: providerSource as SearchSource | 'all' | 'index',
+    source: providerSource as SearchSource | 'all',
     enabled: hasSearched && source !== 'i2p',
   });
 

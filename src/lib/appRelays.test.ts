@@ -59,7 +59,7 @@ describe('relay pools', () => {
     hideDefaultIndexRelay(INDEX_RELAYS[1]);
     hideDefaultSearchRelay(SEARCH_RELAYS[0]);
     restoreAllDefaultIndexRelays();
-    expect(getIndexRelayUrls()).toEqual([...INDEX_RELAYS]);
+    expect(getIndexRelayUrls()).toEqual(INDEX_RELAYS.filter((url) => !url.includes('.onion')));
     restoreDefaultSearchRelay(SEARCH_RELAYS[0]);
     expect(getSearchRelayUrls()).toContain(SEARCH_RELAYS[0]);
   });
@@ -84,6 +84,11 @@ describe('relay pools', () => {
 
     removeCustomIndexRelay('wss://my-relay.example/');
     expect(getIndexRelayUrls()).not.toContain('wss://my-relay.example/');
+  });
+
+  it('converts pasted http(s) URLs to the equivalent websocket scheme', () => {
+    expect(normalizeRelayUrl('https://relay.example')).toBe('wss://relay.example/');
+    expect(normalizeRelayUrl('http://relay.example/nostr')).toBe('ws://relay.example/nostr');
   });
 
   it('normalizes onion hosts to ws:// by default', () => {
