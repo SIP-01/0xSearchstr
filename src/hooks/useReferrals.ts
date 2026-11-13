@@ -38,6 +38,7 @@ import {
   PERMISSIONS,
   resolveRoleEvents,
 } from '@/lib/appProtocol';
+import { APP_PROFILE } from '@/lib/engine/profile';
 import { useAdminAccess } from '@/hooks/useAdminAccess';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 
