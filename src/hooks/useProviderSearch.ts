@@ -98,30 +98,28 @@ export function useProviderSearch({
 
   // Provider states tracked outside React Query for per-provider granularity.
   const [providerStates, setProviderStates] = useState<Map<string, ProviderState>>(new Map());
-  const statesRef = useRef(providerStates);
-  statesRef.current = providerStates;
 
   // ─── Result streaming ──────────────────────────────────────────────
   // Results render as each provider resolves instead of waiting for the
   // slowest one (SearXNG via proxy can take seconds; the Nostr index
   // answers in ~100ms). The final complete set still lands in the query
   // cache as `data`.
-  const [streamed, setStreamed] = useState<SearchResult[]>([]);
   const streamKey = `${query}||${source}||${privacyMode}`;
+  const [streamedState, setStreamedState] = useState<{ key: string; results: SearchResult[] }>({ key: streamKey, results: [] });
   const streamKeyRef = useRef(streamKey);
-  if (streamKeyRef.current !== streamKey) {
-    // Query changed — reset the stream before any new appends land.
+  useEffect(() => {
     streamKeyRef.current = streamKey;
-    setStreamed([]);
-  }
+  }, [streamKey]);
+  const streamed = streamedState.key === streamKey ? streamedState.results : [];
 
   /** Append a provider's results to the visible stream (dedupe + coverage rank). */
   const appendStreamed = useCallback((key: string, fresh: SearchResult[], query: string) => {
     if (fresh.length === 0) return;
-    setStreamed((prev) => {
+    setStreamedState((prev) => {
       if (streamKeyRef.current !== key) return prev; // stale provider from an old query
-      const merged = deduplicateResults([...prev, ...fresh]);
-      return sortByQueryRelevance(merged, query);
+      const previous = prev.key === key ? prev.results : [];
+      const merged = deduplicateResults([...previous, ...fresh]);
+      return { key, results: sortByQueryRelevance(merged, query) };
     });
   }, []);
 
@@ -223,14 +221,13 @@ export function useProviderSearch({
 
   // The visible result set: the completed (cached) data once available,
   // the live stream while providers are still resolving.
-  const baseResults = data?.results ?? streamed;
-
-  // Apply owner-signed moderation filtering to whatever is visible.
+  // Apply owner-signed moderation filtering to the completed data or live stream.
   // (Additive: until the moderation list loads, nothing is filtered.)
   const allResults = useMemo(() => {
+    const baseResults = data?.results ?? streamed;
     if (!moderationSet) return baseResults;
     return baseResults.filter((r) => !isHiddenResult(r, moderationSet));
-  }, [baseResults, moderationSet]);
+  }, [data?.results, streamed, moderationSet]);
   const suggestions = data?.suggestions ?? [];
 
   // Reset provider states when query clears.
@@ -272,14 +269,15 @@ export function useProviderSearch({
     return c as Record<SearchSource | 'all', number>;
   }, [allResults]);
 
-  // Invalidate stale queries when source changes.
+  // Invalidate stale queries when source changes, outside render.
   const prevSourceRef = useRef(source);
-  if (prevSourceRef.current !== source) {
+  useEffect(() => {
+    if (prevSourceRef.current === source) return;
     prevSourceRef.current = source;
     if (query.trim()) {
-      queryClient.invalidateQueries({ queryKey: ['provider-search', query, source] });
+      void queryClient.invalidateQueries({ queryKey: ['provider-search', query] });
     }
-  }
+  }, [source, query, queryClient]);
 
   return {
     results: allResults,
