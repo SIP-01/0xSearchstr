@@ -69,6 +69,8 @@ const Index = () => {
     privacyMode,
     suppressedProviders,
     cancelSearch,
+    restartSearch,
+    isStopped,
   } = useProviderSearch({
     query: activeQuery,
     source: providerSource as SearchSource | 'all',
@@ -139,13 +141,14 @@ const Index = () => {
   });
 
   const handleSubmit = useCallback((value: string) => {
+    restartSearch();
     setActiveQuery(value);
     setSearchParams((prev) => {
       prev.set('q', value);
       prev.set('source', source);
       return prev;
     });
-  }, [source, setSearchParams]);
+  }, [source, setSearchParams, restartSearch]);
 
   const handleSourceChange = useCallback((newSource: SourceTabValue) => {
     setSource(newSource);
