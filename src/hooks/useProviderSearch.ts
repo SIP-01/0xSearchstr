@@ -196,6 +196,11 @@ export function useProviderSearch({
               signal,
             });
 
+            if (signal.aborted) {
+              updateProviderState(provider.id, { status: 'cancelled', resultCount: 0 });
+              return { results: [], suggestions: [] } as ProviderSearchResponse;
+            }
+
             const latencyMs = Math.round(performance.now() - start);
 
             updateProviderState(provider.id, {
