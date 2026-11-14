@@ -68,6 +68,7 @@ const Index = () => {
     counts,
     privacyMode,
     suppressedProviders,
+    cancelSearch,
   } = useProviderSearch({
     query: activeQuery,
     source: providerSource as SearchSource | 'all',
@@ -236,6 +237,7 @@ const Index = () => {
             value={query}
             onChange={setQuery}
             onSubmit={handleSubmit}
+            onCancel={cancelSearch}
             isLoading={isFetching}
           />
         </div>
