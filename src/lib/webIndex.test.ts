@@ -77,7 +77,7 @@ describe('documentId / contentHash', () => {
 });
 
 /**
- * SIP-01 spec §13 test vectors (v1.1) — the byte-compatibility contract.
+ * SIP-01 canonical spec §13 test vectors (unchanged across v1–v1.3) — the byte-compatibility contract.
  * Every implementation in the ecosystem (this engine, Crawlstr, the UNCAGED
  * Index Relay) MUST reproduce these exact values.
  */
