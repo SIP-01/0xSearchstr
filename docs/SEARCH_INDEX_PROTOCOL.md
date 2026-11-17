@@ -50,6 +50,15 @@ The builder accepts and the parser surfaces the registered v1 extensions —
 and ignored by consumers that don't know them. `network: tor|i2p` routes an
 observation into the corresponding source tab.
 
+### Capability references (v1.3 companion)
+
+A web observation may optionally carry `role` and repeatable `proto` hint
+tags, and an `a` tag pointing to a separate kind-39698 capability announcement.
+Kind 39698 is the ORBSTR companion profile, not part of the kind-39697
+observation schema. This implementation builds/parses the v1.3 fields in
+`src/lib/webIndex.ts`; it does not treat an announcement as permission to
+invoke its endpoint. See [the canonical capability profile](https://github.com/SIP-01/SIP-01/blob/main/docs/CAPABILITY-DISCOVERY.md).
+
 ### Query acceleration (spec §15)
 
 The reader sends both a plain `{ kinds: [39697], limit }` filter (baseline,
@@ -88,7 +97,7 @@ crawler, relay, and engine in the ecosystem.
 
 ## Links
 
-- Canonical spec (v1.2): <https://github.com/SIP-01/SIP-01>
+- Canonical spec (v1.3): <https://github.com/SIP-01/SIP-01>
 - Implementation guide: <https://github.com/SIP-01/SIP-01/blob/main/docs/IMPLEMENTATION-GUIDE.md>
 - Ecosystem (the [SIP-01 org](https://github.com/SIP-01)):
   [Crawlstr v3](https://github.com/SIP-01/Crawlstr-v3) + [indexstr v2](https://github.com/SIP-01/indexstr-v2)
